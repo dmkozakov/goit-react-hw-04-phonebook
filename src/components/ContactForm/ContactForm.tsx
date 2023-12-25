@@ -1,8 +1,14 @@
-import PropTypes from 'prop-types';
-import { Formik, Field } from 'formik';
+import { Formik, Field, FormikHelpers } from 'formik';
 import * as yup from 'yup';
 import { ValidateError } from './ValidateError.styled';
 import { StyledForm } from './StyledForm.styled';
+import { IFormData } from 'interfaces/IFormData';
+import { IContact } from 'interfaces/IContact';
+
+interface Props {
+  contacts: IContact[];
+  onSubmit: (newContact: IFormData) => void;
+}
 
 const initialValues = {
   name: '',
@@ -26,8 +32,11 @@ const validationSchema = yup.object().shape({
     .required(),
 });
 
-export default function ContactForm({ onSubmit, contacts }) {
-  const handleSubmit = ({ name, number }, { resetForm }) => {
+export default function ContactForm({ onSubmit, contacts }: Props) {
+  const handleSubmit = (
+    { name, number }: IFormData,
+    { resetForm }: FormikHelpers<IFormData>
+  ) => {
     const isRepeat = contacts.find(contact => contact.name === name);
 
     if (isRepeat) {
@@ -73,7 +82,3 @@ export default function ContactForm({ onSubmit, contacts }) {
     </Formik>
   );
 }
-
-ContactForm.propTypes = {
-  onSubmit: PropTypes.func,
-};

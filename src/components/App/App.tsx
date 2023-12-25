@@ -1,23 +1,29 @@
-import { useEffect, useState } from 'react';
+import { ChangeEvent, MouseEvent, useEffect, useState } from 'react';
 import { nanoid } from 'nanoid';
-import ContactForm from './ContactForm/ContactForm';
-import { Filter } from './Filter/Filter';
-import { ContactList } from './ContactList/ContactList';
+import ContactForm from '../ContactForm/ContactForm';
+import { Filter } from '../Filter/Filter';
+import { ContactList } from '../ContactList/ContactList';
 import { Container } from './Container.styled';
-import { ContactFormSection } from './ContactForm/ContactFormSection.styled';
-import { ContactListSection } from './ContactList/ContactListSection.styled';
+import { ContactFormSection } from '../ContactForm/ContactFormSection.styled';
+import { ContactListSection } from '../ContactList/ContactListSection.styled';
+import { IFormData } from 'interfaces/IFormData';
+import { IContact } from 'interfaces/IContact';
 
 const KEY = 'contacts';
 
 export default function App() {
-  const [contacts, setContacts] = useState([]);
+  const [contacts, setContacts] = useState<IContact[]>([]);
   const [filter, setFilter] = useState('');
 
   useEffect(() => {
-    const contacts = JSON.parse(localStorage.getItem(KEY));
+    const savedContacts = localStorage.getItem(KEY);
 
-    if (contacts) {
-      setContacts(contacts);
+    if (typeof savedContacts === 'string') {
+      const contacts = JSON.parse(savedContacts);
+
+      if (contacts) {
+        setContacts(contacts);
+      }
     }
   }, []);
 
@@ -27,11 +33,11 @@ export default function App() {
     }
   }, [contacts]);
 
-  const changeFilter = e => {
+  const changeFilter = (e: ChangeEvent<HTMLInputElement>) => {
     setFilter(e.target.value.toLowerCase());
   };
 
-  const formSubmitHandler = ({ name, number }) => {
+  const formSubmitHandler = ({ name, number }: IFormData) => {
     const contact = {
       id: nanoid(),
       name,
@@ -47,9 +53,9 @@ export default function App() {
     );
   };
 
-  const removeContact = e => {
+  const removeContact = (e: MouseEvent<HTMLButtonElement>) => {
     const updatedContacts = contacts.filter(
-      contact => contact.id !== e.target.dataset.id
+      contact => contact.id !== (e.target as HTMLButtonElement).dataset.id
     );
     setContacts(updatedContacts);
   };
